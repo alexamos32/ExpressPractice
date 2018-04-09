@@ -7,47 +7,29 @@ const app = express();
 app.listen(3000);
 
 app.set('view engine', 'pug');
+
 app.use(parser.urlencoded({extended: false}));
 app.use(cookieParser());
 
-app.get('/',(req, res) => {
-    const name = req.cookies.username;
-    if(name){
-        res.render('index', {name: name});
-    }
-    else{
-        res.render('index');
-    }
+const mainRoutes = require('./routes/index');
+const cardRoutes = require('./routes/cards')
+
+app.use(mainRoutes);
+app.use('/cards', cardRoutes);
+
+
+
+app.use((req, res, next) => {
+    const err = new Error("Not Found");
+    err.status = 404;
+    next(err);
 
 });
 
-app.post('/',(req, res) =>{
-    const name = req.cookies.username;
-    if (name) {
-        res.clearCookie('username');
-        res.render('index');
-    }
-    else{
-        res.redirect('/hello')
-    }
-});
-
-app.get('/cards', (req, res) => {
-    res.render('card', {prompt: "Who is buried in Grant's tomb?", hint: "Think about who's tomb it is."});
-});
 
 
-app.get('/hello', (req, res) => {
-    const name = req.cookies.name;
-    if (name) {
-        res.redirect('/');
-    }
-    else {
-        res.render('hello');
-    }
-});
-
-app.post('/hello', (req, res) => {
-    res.cookie('username', req.body.username);
-    res.redirect('/');
+app.use((err, req, res, next) => {
+    res.locals.error = err;
+    res.status(err.status);
+    res.render('error');
 });
