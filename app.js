@@ -4,15 +4,15 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
-app.listen(3000);
+app.use(parser.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use('/static', express.static('public'));
 
 app.set('view engine', 'pug');
 
-app.use(parser.urlencoded({extended: false}));
-app.use(cookieParser());
+const mainRoutes = require('./routes');
+const cardRoutes = require('./routes/cards');
 
-const mainRoutes = require('./routes/index');
-const cardRoutes = require('./routes/cards')
 
 app.use(mainRoutes);
 app.use('/cards', cardRoutes);
@@ -32,4 +32,8 @@ app.use((err, req, res, next) => {
     res.locals.error = err;
     res.status(err.status);
     res.render('error');
+});
+
+app.listen(3000, () => {
+    console.log('The Application is running on localhost:3000');
 });

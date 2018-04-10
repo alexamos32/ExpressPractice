@@ -1,34 +1,18 @@
 const express = require('express');
 const router = express.Router();
 
-
-
-
 router.get('/',(req, res) => {
     const name = req.cookies.username;
-    if(name){
-        res.render('index', {name: name});
+    if(name) {
+        res.render('index', { name });
     }
     else{
-        res.render('index');
-    }
-
-});
-
-router.post('/',(req, res) =>{
-    const name = req.cookies.username;
-    if (name) {
-        res.clearCookie('username');
-        res.render('index');
-    }
-    else{
-        res.redirect('/hello')
+        res.redirect('/hello');
     }
 });
-
 
 router.get('/hello', (req, res) => {
-    const name = req.cookies.name;
+    const name = req.cookies.username;
     if (name) {
         res.redirect('/');
     }
@@ -40,6 +24,11 @@ router.get('/hello', (req, res) => {
 router.post('/hello', (req, res) => {
     res.cookie('username', req.body.username);
     res.redirect('/');
+});
+
+router.post('/goodbye', (req, res) => {
+    res.clearCookie('username');
+    res.redirect('/hello');
 });
 
 module.exports = router;
